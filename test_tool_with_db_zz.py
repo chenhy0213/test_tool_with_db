@@ -98,15 +98,15 @@ class SmartConfigDialog(QDialog):
         
         # 创建标签页
         self.tab_widget = QTabWidget()
-        
-        # 数据库配置页
-        self.create_database_tab()
-        
+
         # 查询配置页
         self.create_query_config_tab()
-        
+
         # 字段配置页
         self.create_fields_tab()
+
+        # 数据库配置页
+        self.create_database_tab()
         
         right_layout.addWidget(self.tab_widget)
         
