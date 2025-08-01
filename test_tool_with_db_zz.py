@@ -624,7 +624,9 @@ class DatabaseConnection:
             raise ConnectionError("数据库未连接")
             
         try:
-            with self.connection.cursor() as cursor:    
+            with self.connection.cursor() as cursor:   
+                # 开始事务
+                self.connection.begin() 
                 cursor.execute(sql)
                 
                 # 判断SQL类型
@@ -635,12 +637,17 @@ class DatabaseConnection:
                     results = cursor.fetchall()
                     return results if results else []
                 elif sql_upper.startswith(('INSERT', 'UPDATE', 'DELETE')):
-                    # 增删改操作
+                    # 增删改操作 - 必须提交事务
+                    self.connection.commit()
                     return [{"affected_rows": cursor.rowcount, "success": True}]
                 else:
-                    # 其他SQL语句
+                    # 其他SQL语句 - 也需要提交事务
+                    self.connection.commit()
                     return [{"affected_rows": cursor.rowcount, "success": True}]
         except Exception as e:
+            # 发生错误时回滚
+            if self.connection:
+                self.connection.rollback()
             raise e
 
     def execute_multiple_queries(self, sql_statements: List[str], params: Dict[str, Any] = None) -> List[Dict[str, Any]]:
@@ -651,8 +658,14 @@ class DatabaseConnection:
         results = []
         
         try:
+            # 开始事务
+            self.connection.begin()
+            
             with self.connection.cursor() as cursor:
                 for index, sql in enumerate(sql_statements):
+                    if not sql.strip():  # 跳过空语句
+                        continue
+                        
                     # 替换占位符
                     processed_sql = sql
                     if params:
@@ -678,11 +691,12 @@ class DatabaseConnection:
                         })
                     else:
                         # 增删改操作
+                        affected_rows = cursor.rowcount
                         results.append({
                             "statement_index": index + 1,
                             "sql": processed_sql,
                             "type": "MODIFY",
-                            "affected_rows": cursor.rowcount,
+                            "affected_rows": affected_rows,
                             "success": True
                         })
                 
@@ -691,7 +705,9 @@ class DatabaseConnection:
                 return results
                 
         except Exception as e:
-            self.connection.rollback()
+            # 回滚事务
+            if self.connection:
+                self.connection.rollback()
             raise e
             
     def close(self):
