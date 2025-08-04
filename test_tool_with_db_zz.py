@@ -1380,6 +1380,10 @@ class DatabaseTool(QMainWindow):
         """序列化datetime对象为字符串"""
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
+        elif hasattr(obj, '__float__'):  # 处理Decimal类型
+            return float(obj)
+        elif hasattr(obj, '__int__'):  # 处理其他数值类型
+            return int(obj)
         raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
         
     def append_result(self, text: str):
