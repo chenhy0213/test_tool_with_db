@@ -114,6 +114,17 @@ class SmartConfigDialog(QDialog):
         button_box = QDialogButtonBox(
             QDialogButtonBox.Save | QDialogButtonBox.Cancel | QDialogButtonBox.Apply
         )
+        
+        # 修改按钮文本
+        save_btn = button_box.button(QDialogButtonBox.Save)
+        save_btn.setText("保存并关闭")
+        
+        cancel_btn = button_box.button(QDialogButtonBox.Cancel)
+        cancel_btn.setText("取消")
+        
+        apply_btn = button_box.button(QDialogButtonBox.Apply)
+        apply_btn.setText("应用")
+        
         button_box.accepted.connect(self.save_and_close)
         button_box.rejected.connect(self.reject)
         button_box.button(QDialogButtonBox.Apply).clicked.connect(self.apply_changes)
@@ -521,6 +532,7 @@ class SmartConfigDialog(QDialog):
 
 
 class ConfigEditorDialog(QDialog):
+    
     """配置文件编辑对话框（保留原有的文本编辑模式）"""
     
     def __init__(self, config_path, parent=None):
