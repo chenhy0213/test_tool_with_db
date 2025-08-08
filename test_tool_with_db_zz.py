@@ -513,6 +513,12 @@ class SmartConfigDialog(QDialog):
             # 保存到文件
             with open(self.config_path, 'w', encoding='utf-8') as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=2)
+            
+            # 添加：更新左侧列表显示
+            if self.current_query_index >= 0 and self.current_query_index < self.query_list.count():
+                current_item = self.query_list.item(self.current_query_index)
+                if current_item:
+                    current_item.setText(self.query_name.text())
                 
             return True
             
