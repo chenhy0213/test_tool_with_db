@@ -1176,7 +1176,7 @@ class DatabaseTool(QMainWindow):
         group_layout.addWidget(sql_group)
         
         # 创建执行按钮
-        execute_btn = QPushButton("🔍 执行查询")
+        execute_btn = QPushButton("🔍 执行/查询")
         execute_btn.setStyleSheet("""
             QPushButton {
                 background-color: #0078d4;
